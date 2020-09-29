@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:netflix_clone/model/model_movie.dart';
+import 'package:netflix_clone/widget/box_slider.dart';
 import 'package:netflix_clone/widget/carousel_slider.dart';
+import 'package:netflix_clone/widget/circle_slider.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -8,16 +11,27 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Movie> movies = [
-    Movie.fromMap({
-      'title': '사랑의 불시착',
-      'keyword': '사랑/로맨스/판타지',
-      'poster': 'test_movie_1.png',
-      'like': false
-    })
-  ];
+  Firestore firestore = Firestore.instance;
+  Stream<QuerySnapshot> streamData;
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    super.initState();
+    streamData = firestore.collection('movie').snapshots(); // streamdata를 불러옴
+  }
+
+  Widget _fetchData(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: Firestore.instance.collection('movie').snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) return LinearProgressIndicator();
+        return _buildBody(
+            context, snapshot.data.documents); // buildbody를 호출하여 실제 위젯을 만듬
+      },
+    );
+  }
+
+  Widget _buildBody(BuildContext context, List<DocumentSnapshot> snapshot) {
+    List<Movie> movies = snapshot.map((d) => Movie.fromSnapShot(d)).toList();
     return ListView(
       children: [
         Stack(
@@ -27,9 +41,20 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             TopBar(),
           ],
+        ),
+        CircleSlider(
+          movies: movies,
+        ),
+        BoxSlider(
+          movies: movies,
         )
       ],
     );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _fetchData(context);
   }
 }
 
