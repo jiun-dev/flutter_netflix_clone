@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:netflix_clone/screen/home_screen.dart';
+import 'package:netflix_clone/screen/like_screen.dart';
 import 'package:netflix_clone/screen/more_screen.dart';
+import 'package:netflix_clone/screen/search_screen.dart';
 import 'package:netflix_clone/widget/bottom_bar.dart';
 
 void main() {
@@ -30,8 +32,8 @@ class _MyAppState extends State<MyApp> {
                   NeverScrollableScrollPhysics(), // 손가락 움직임으로 스크롤 되는 것을 막는 기능
               children: [
                 HomeScreen(),
-                Container(),
-                Container(),
+                SearchScreen(),
+                LikeScreen(),
                 MoreScreen(),
               ],
             ),
